@@ -1,0 +1,1281 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Cryptal Exchange API",
+    "description": "<h1>General Info</h1>\n\n<h3>Base URL: <strong>https://exchange.cryptal.com/exchange</strong></h3>\n\n<ul>\n\t<li>All endpoints return either a JSON object or array.</li>\n\t<li>Data is returned in ascending order. Oldest first, newest last.</li>\n\t<li>All time and timestamp related fields are in milliseconds.</li>\n</ul>",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://exchange.cryptal.com/exchange",
+      "description": "core"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Overview",
+      "description": "<a name=\"Authentication\"></a>\n# Authentication\n\n <h2>bearerAuth</h2><p>All requests require to be fully authenticated through the HTTP header Authorization. The format is Authorization: <code>Bearer {Token}</code></p><div><table><tbody><tr><th> Security Scheme Type </th><td> HTTP </td></tr><tr><th> HTTP Authorization Scheme </th><td> bearer </td></tr></tbody></table></div>\n\n   <a name=\"http-status-codes\"></a>\n# HTTP Status Codes\n\nThe API returns the following HTTP status codes:\n\n|HTTP Status|Meaning|Description|\n|---|---|---|\n|**200**|Success|The operation succeeded|\n|**400**|Bad Request|The client request is invalid|\n|**401**|Unauthorized|Authentication failed (e.g. invalid token specified by the Authorization header)|\n|**403**|Forbidden|Request received, but the operation is not allowed|\n|**404**|Not Found|Requested resource does not exist|\n|**500**|Internal Server Error|This error indicates that the server has encountered an unexpected condition\n\n<a name=\"error-handling\"></a>\n# Error Handling\n\nIf a request fails, the HTTP status code of the response is different and the body contains an error object structuring the detailed cause of the problem.\n\n```\n{\n  \"errorKey\": \"validate.unknown_pair\",\n  \"errorType\": \"ERROR\",\n  \"errorMessage\": \"Unknown pair\",\n  \"params\": null,\n  \"transParams\": null\n}\n```\n\nThe `errorCode` value is the HTTP status code and `errorMessage` is a human-readable description of the specific error."
+    }
+  ],
+  "paths": {
+    "/api/v1/public/orderbook/{pair}": {
+      "get": {
+        "tags": [
+          "Public Methods"
+        ],
+        "summary": "Get Order book",
+        "description": "<p>Used to get retrieve the order book for a given pair.<br /><br />\n  <a href=\"https://exchange.cryptal.com/exchange/api/v1/public/orderbook/BTC-USD\">Get /api/v1/public/orderbook/BTC-USD</a>\n</p>\n<pre>\n<code class=\"language-json\">\n{\n  \"timestamp\": 1611750008159,\n  \"bids\": [\n    {\n      \"price\": \"30121.73\",\n      \"volume\": \"0.380001\",\n      \"totalCost\": \"11446.28752173\"\n    },\n    {\n      \"price\": \"30091.60\",\n      \"volume\": \"0.418001\",\n      \"totalCost\": \"12578.31889160\"\n    },\n    ...\n  ],\n  \"asks\": [\n    {\n      \"price\": \"30789.06\",\n      \"volume\": \"0.253557\",\n      \"totalCost\": \"7806.78168642\"\n    },\n    {\n      \"price\": \"30819.84\",\n      \"volume\": \"0.278913\",\n      \"totalCost\": \"8596.05403392\"\n    },\n    ...\n  ]\n}</code></pre>",
+        "operationId": "getOrderBook",
+        "parameters": [
+          {
+            "name": "pair",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "A currency pair is the quotation of two different currencies, with the value of one currency being quoted against the other. The first listed currency of a currency pair is called the base currency, and the second currency is called the quote currency. E.g: ETH-BTC, BTC-USD, USDT-USD"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100,
+              "description": "limits:[25, 100]. limit the number of records returned based on a limit value"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderBookView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/public/allMarketsSummery": {
+      "get": {
+        "tags": [
+          "Public Methods"
+        ],
+        "summary": "Get All info about markets summery",
+        "description": "<p>Used to get the last 24 hour summary of all active markets. You will get information on both tickers and pairs.<br /><br />\n\n  <a href=\"https://exchange.cryptal.com/exchange/api/v1/public/allMarketsSummery\">Get /api/v1/public/allMarketsSummery</a>\n</p>\n<pre>\n<code class=\"language-json\">\n{\n  \"tickers\":\n  [\n    {\n      \"pair\": \"BTC-USD\",\n      \"minPrice\": \"31021.33\",\n      \"maxPrice\": \"32777.00\",\n      \"askPrice\": 23255.28,\n      \"bidPrice\": 23014.84,\n      \"baseVolume\": \"3.584040\",\n      \"quoteVolume\": \"8972206.39\",\n      \"lastTradePrice\": \"31088.00\",\n      \"lastTradeVolume\": \"0.008880\",\n      \"openPrice\": \"32427.16\",\n      \"priceChange\": \"-2.30\",\n      \"tradeCount\": 298,\n      \"timestamp\": 0\n    },\n    ...,\n  ],\n  \"pairs\":\n  [\n    {\n      \"pair\": \"BTC-USD\",\n      \"baseCurrency\": \"BTC\",\n      \"baseScale\": \"6\",\n      \"quoteCurrency\": \"USD\",\n      \"quoteScale\": \"2\",\n      \"minSize\": \"0.000001\",\n      \"minCost\": \"5\",\n      \"maxSize\": \"100000000000000000\",\n      \"maxPrice\": null,\n      \"takerFee\": \"0.0025\",\n      \"makerFee\": \"0.0025\",\n      \"orderTypes\": [\n        \"MARKET\",\n        \"LIMIT_ORDER\"\n      ],\n      \"tradeEnabled\": true\n    },\n    ...,\n  ]\n}</code></pre>",
+        "operationId": "getAllMarketsSummery",
+        "responses": {
+          "default": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AllMarketsSummeryView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/public/currencies": {
+      "get": {
+        "tags": [
+          "Public Methods"
+        ],
+        "summary": "Get Currencies",
+        "description": "<p>Used to get all supported currencies at Cryptal along with other meta data. <br><br>\n  <a href=\"https://exchange.cryptal.com/exchange/api/v1/public/currencies\">Get /api/v1/public/currencies</a>\n</p>\n<pre>\n<code class=\"language-json\">\n[\n  {\n    \"code\": \"USD\",\n    \"name\": \"United states dollar\",\n    \"type\": \"FIAT\",\n    \"transactionUrlPattern\": null,\n    \"addressUrlPattern\": null\n  },\n  {\n    \"code\": \"USDT\",\n    \"name\": \"USDT\",\n    \"type\": \"CRYPTO\",\n    \"transactionUrlPattern\": \"https://etherscan.io/tx/{transactionId}\",\n    \"addressUrlPattern\": \"https://etherscan.io/address/{address} \"\n  },\n  {\n    \"code\": \"BTC\",\n    \"name\": \"Bitcoin\",\n    \"type\": \"CRYPTO\",\n    \"transactionUrlPattern\": \"https://btc.bitaps.com/{transactionId}\",\n    \"addressUrlPattern\": \"https://btc.bitaps.com/{address}\"\n  },\n  ...\n]\n</code></pre>",
+        "operationId": "getCurrencies",
+        "responses": {
+          "default": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CurrencyView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/public/pairs": {
+      "get": {
+        "tags": [
+          "Public Methods"
+        ],
+        "summary": "Get Pairs",
+        "description": "<p>Used to get the open and available trading markets at Cryptal&nbsp;along with other meta data<br /><br />\n  <a href=\"https://exchange.cryptal.com/exchange/api/v1/public/pairs\">Get /api/v1/public/pairs</a>\n</p>\n<pre>\n<code class=\"language-json\">\n[\n  {\n    \"pair\": \"BTC-USD\",\n    \"baseCurrency\": \"BTC\",\n    \"baseScale\": \"6\",\n    \"quoteCurrency\": \"USD\",\n    \"quoteScale\": \"2\",\n    \"minSize\": \"0.000001\",\n    \"minCost\": \"5\",\n    \"maxSize\": \"100000000000000000\",\n    \"maxPrice\": null,\n    \"takerFee\": \"0.0025\",\n    \"makerFee\": \"0.0025\",\n    \"orderTypes\": [\n      \"MARKET\",\n      \"LIMIT_ORDER\"\n    ],\n    \"tradeEnabled\": true\n  },\n  {\n    \"pair\": \"USDT-USD\",\n    \"baseCurrency\": \"USDT\",\n    \"baseScale\": \"5\",\n    \"quoteCurrency\": \"USD\",\n    \"quoteScale\": \"4\",\n    \"minSize\": \"0.00001\",\n    \"minCost\": \"5\",\n    \"maxSize\": \"100000000000000000\",\n    \"maxPrice\": null,\n    \"takerFee\": \"0.0025\",\n    \"makerFee\": \"0.0025\",\n    \"orderTypes\": [\n      \"MARKET\",\n      \"LIMIT_ORDER\"\n    ],\n    \"tradeEnabled\": true\n  },\n  \n  {\n    \"pair\": \"ETH-BTC\",\n    \"baseCurrency\": \"ETH\",\n    \"baseScale\": \"4\",\n    \"quoteCurrency\": \"BTC\",\n    \"quoteScale\": \"6\",\n    \"minSize\": \"0.0001\",\n    \"minCost\": \"0.0004\",\n    \"maxSize\": \"100000000000000000\",\n    \"maxPrice\": null,\n    \"takerFee\": \"0.0025\",\n    \"makerFee\": \"0.0025\",\n    \"orderTypes\": [\n      \"MARKET\",\n      \"LIMIT_ORDER\"\n    ],\n    \"tradeEnabled\": true\n  },\n  ...\n]\n</code></pre>",
+        "operationId": "getPairs",
+        "responses": {
+          "default": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PairView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/public/ticker": {
+      "get": {
+        "tags": [
+          "Public Methods"
+        ],
+        "summary": "Get Ticker Data",
+        "description": "<p>With this method you can find the complete list of Tickers<br /><br />\n  <a href=\"https://exchange.cryptal.com/exchange/api/v1/public/ticker\">Get /api/v1/public/ticker</a>\n</p>\n<pre>\n<code class=\"language-json\">\n[\n  {\n    \"pair\": \"BTC-USD\",\n    \"minPrice\": \"30627.21\",\n    \"maxPrice\": \"32777.00\",\n    \"askPrice\": null,\n    \"bidPrice\": null,\n    \"baseVolume\": \"3.565200\",\n    \"quoteVolume\": \"8986368.46\",\n    \"lastTradePrice\": \"30778.74\",\n    \"lastTradeVolume\": \"0.009240\",\n    \"openPrice\": \"32427.16\",\n    \"priceChange\": \"-3.55\",\n    \"tradeCount\": 300,\n    \"timestamp\": 0\n  },\n  {\n    \"pair\": \"USDT-USD\",\n    \"minPrice\": \"0.9997\",\n    \"maxPrice\": \"1.0028\",\n    \"askPrice\": null,\n    \"bidPrice\": null,\n    \"baseVolume\": \"32412.60000\",\n    \"quoteVolume\": \"3693333.4194\",\n    \"lastTradePrice\": \"1.0027\",\n    \"lastTradeVolume\": \"127.60000\",\n    \"openPrice\": \"1.0010\",\n    \"priceChange\": \"0.11\",\n    \"tradeCount\": 291,\n    \"timestamp\": 0\n  },\n  {\n    \"pair\": \"ETH-BTC\",\n    \"minPrice\": \"0.040157\",\n    \"maxPrice\": \"0.042198\",\n    \"askPrice\": null,\n    \"bidPrice\": null,\n    \"baseVolume\": \"23.2584\",\n    \"quoteVolume\": \"2.531725\",\n    \"lastTradePrice\": \"0.040937\",\n    \"lastTradeVolume\": \"0.0832\",\n    \"openPrice\": \"0.042198\",\n    \"priceChange\": \"-0.85\",\n    \"tradeCount\": 298,\n    \"timestamp\": 0\n  },\n  ...\n]\n</code></pre>\n",
+        "operationId": "getTicker",
+        "parameters": [
+          {
+            "name": "pair",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "A currency pair is the quotation of two different currencies, with the value of one currency being quoted against the other. The first listed currency of a currency pair is called the base currency, and the second currency is called the quote currency. E.g: ETH-BTC, BTC-USD, USDT-USD"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TickerView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/public/trades/{pair}": {
+      "get": {
+        "tags": [
+          "Public Methods"
+        ],
+        "summary": "Get Trades",
+        "description": "<p>Used to retrieve the latest trades that have occurred for a specific pair.<br /><br />\n  <a href=\"https://exchange.cryptal.com/exchange/api/v1/public/trades/BTC-USD\">Get /api/v1/public/trades/BTC-USD</a>\n</p>\n<pre>\n<code class=\"language-json\">\n[\n  {\n    \"id\": \"39369\",\n    \"price\": \"30645.23\",\n    \"volume\": \"0.011280\",\n    \"quoteVolume\": \"345.68\",\n    \"side\": \"ASK\",\n    \"timestamp\": 1611766117823\n  },\n  {\n    \"id\": \"39366\",\n    \"price\": \"30731.66\",\n    \"volume\": \"0.014400\",\n    \"quoteVolume\": \"442.54\",\n    \"side\": \"BID\",\n    \"timestamp\": 1611765243024\n  },\n  {\n    \"id\": \"39365\",\n    \"price\": \"30891.40\",\n    \"volume\": \"0.011280\",\n    \"quoteVolume\": \"348.45\",\n    \"side\": \"BID\",\n    \"timestamp\": 1611764951352\n  },\n  {\n    \"id\": \"39364\",\n    \"price\": \"30688.11\",\n    \"volume\": \"0.014280\",\n    \"quoteVolume\": \"438.23\",\n    \"side\": \"ASK\",\n    \"timestamp\": 1611764659750\n  },\n  ...\n]</code></pre>",
+        "operationId": "getTrades",
+        "parameters": [
+          {
+            "name": "pair",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "A currency pair is the quotation of two different currencies, with the value of one currency being quoted against the other. The first listed currency of a currency pair is called the base currency, and the second currency is called the quote currency. E.g: ETH-BTC, BTC-USD, USDT-USD"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "description": "OFFSET value must be greater than or equal to zero. It cannot be negative, else return error."
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100,
+              "description": "Any request is allowed ; max 1000. limit the number of records returned based on a limit value"
+            }
+          },
+          {
+            "name": "fromId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "description": "Trade id to fetch from. Default gets most recent trades."
+            }
+          },
+          {
+            "name": "fromTimestamp",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "description": "From timestamp, Format in Unix Epoch Time: 1582882393000 (milliseconds since 1 Jan 1970), which is equal to 2020-02-28 13:33:13.113108"
+            }
+          },
+          {
+            "name": "toTimestamp",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "description": "To timestamp, Format in Unix Epoch Time: 1582882393000 (milliseconds since 1 Jan 1970), which is equal to 2020-02-28 13:33:13.113108"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TradeView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/private/trading/openOrders": {
+      "get": {
+        "tags": [
+          "Trading Methods"
+        ],
+        "summary": "Get Open Orders",
+        "description": "Get all open orders on a symbol. If the symbol is not sent, orders for all symbols will be returned in an array.",
+        "operationId": "getOpenOrders",
+        "parameters": [
+          {
+            "name": "pair",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "A currency pair is the quotation of two different currencies, with the value of one currency being quoted against the other. The first listed currency of a currency pair is called the base currency, and the second currency is called the quote currency. E.g: ETH-BTC, BTC-USD, USDT-USD"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/private/trading/orderHistory": {
+      "get": {
+        "tags": [
+          "Trading Methods"
+        ],
+        "summary": "Get Order History",
+        "description": "Get all Order History on a symbol. If the symbol is not sent, Order History for all symbols will be returned in an array.",
+        "operationId": "getOrderHistory",
+        "parameters": [
+          {
+            "name": "pair",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "A currency pair is the quotation of two different currencies, with the value of one currency being quoted against the other. The first listed currency of a currency pair is called the base currency, and the second currency is called the quote currency. E.g: ETH-BTC, BTC-USD, USDT-USD"
+            }
+          },
+          {
+            "name": "fromTimestamp",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "description": "From timestamp, Format in Unix Epoch Time: 1582882393000 (milliseconds since 1 Jan 1970), which is equal to 2020-02-28 13:33:13.113108"
+            }
+          },
+          {
+            "name": "toTimestamp",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "description": "To timestamp, Format in Unix Epoch Time: 1582882393000 (milliseconds since 1 Jan 1970), which is equal to 2020-02-28 13:33:13.113108"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "description": "OFFSET value must be greater than or equal to zero. It cannot be negative, else return error."
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100,
+              "description": "limit the number of records returned based on a limit value"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/private/trading/trades": {
+      "get": {
+        "tags": [
+          "Trading Methods"
+        ],
+        "summary": "Get Trade History",
+        "description": "Get all trades on a symbol. If the symbol is not sent, trades for all symbols will be returned in an array.",
+        "operationId": "getTradeHistory",
+        "parameters": [
+          {
+            "name": "pair",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "A currency pair is the quotation of two different currencies, with the value of one currency being quoted against the other. The first listed currency of a currency pair is called the base currency, and the second currency is called the quote currency. E.g: ETH-BTC, BTC-USD, USDT-USD"
+            }
+          },
+          {
+            "name": "fromId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "description": "Trade id to fetch from. Default gets most recent trades.\n"
+            }
+          },
+          {
+            "name": "fromTimestamp",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "description": "From timestamp, Format in Unix Epoch Time: 1582882393000 (milliseconds since 1 Jan 1970), which is equal to 2020-02-28 13:33:13.113108"
+            }
+          },
+          {
+            "name": "toTimestamp",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "description": "To timestamp, Format in Unix Epoch Time: 1582882393000 (milliseconds since 1 Jan 1970), which is equal to 2020-02-28 13:33:13.113108"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "description": "OFFSET value must be greater than or equal to zero. It cannot be negative, else return error."
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100,
+              "description": "limit the number of records returned based on a limit value"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TradePrivateView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/private/trading/newOrder": {
+      "post": {
+        "tags": [
+          "Trading Methods"
+        ],
+        "summary": "New Order (TRADE)",
+        "description": "Send in a new order.",
+        "operationId": "createOrder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderResultView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/private/trading/cancelOrder/{orderId}": {
+      "delete": {
+        "tags": [
+          "Trading Methods"
+        ],
+        "summary": "Cancel Order (TRADE)",
+        "description": "Cancel an active order.",
+        "operationId": "cancelOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelOrderView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/private/account/balance": {
+      "get": {
+        "tags": [
+          "Account Methods"
+        ],
+        "summary": "Get Account Balances",
+        "operationId": "getBalances",
+        "responses": {
+          "default": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BalanceWrapperView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/private/account/withdraw/crypto": {
+      "post": {
+        "tags": [
+          "Account Methods"
+        ],
+        "summary": "Withdraw crypto",
+        "operationId": "withdrawCrypto",
+        "parameters": [
+          {
+            "name": "OTP",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoinWithdrawalRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WithdrawView"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PairView": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string",
+            "description": "A currency pair is the quotation of two different currencies, with the value of one currency being quoted against the other. The first listed currency of a currency pair is called the base currency, and the second currency is called the quote currency. E.g: ETH-BTC, BTC-USD, USDT-USD"
+          },
+          "baseCurrency": {
+            "type": "string",
+            "description": "In a currency pair quote, the base currency, also known as the primary currency, is the first currency shown. The second currency shown is referred to as the quote currency. Currencies are quoted in relation to other currencies. For example, in the BTC-USD currency pair, BTC is the first currency shown, and always has a value of one. The base currency is the reference element for the exchange rate of the currency pair."
+          },
+          "baseScale": {
+            "type": "string",
+            "description": "scale represents the accuracy of a float after a point"
+          },
+          "quoteCurrency": {
+            "type": "string",
+            "description": "It is used to determine the value of the base currency. "
+          },
+          "quoteScale": {
+            "type": "string",
+            "description": "scale represents the accuracy of a float after a point"
+          },
+          "minSize": {
+            "type": "string",
+            "description": "Minimum trading amount in base currency"
+          },
+          "minCost": {
+            "type": "string",
+            "description": "Minimum trading amount in quote currency"
+          },
+          "maxSize": {
+            "type": "string",
+            "description": "Maximum trading amount in base currency"
+          },
+          "maxPrice": {
+            "type": "string",
+            "description": ""
+          },
+          "takerFee": {
+            "type": "string",
+            "description": "The maker and taker model is a way to differentiate fees between trade orders that provide liquidity (\"maker orders\") and take away liquidity (\"taker orders\"). Maker and taker trade orders are charged different fees. "
+          },
+          "makerFee": {
+            "type": "string",
+            "description": "The maker and taker model is a way to differentiate fees between trade orders that provide liquidity (\"maker orders\") and take away liquidity (\"taker orders\"). Maker and taker trade orders are charged different fees. "
+          },
+          "orderTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "MARKET",
+                "LIMIT_ORDER"
+              ]
+            }
+          },
+          "tradeEnabled": {
+            "type": "boolean",
+            "description": "The trade is disabled or enabled in the pair"
+          }
+        }
+      },
+      "TickerView": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string",
+            "description": "A currency pair is the quotation of two different currencies, with the value of one currency being quoted against the other. The first listed currency of a currency pair is called the base currency, and the second currency is called the quote currency. E.g: ETH-BTC, BTC-USD, USDT-USD"
+          },
+          "minPrice": {
+            "type": "string",
+            "description": "Specifies the minimum price within 24 hours"
+          },
+          "maxPrice": {
+            "type": "string",
+            "description": "Specifies the maximum price within 24 hours"
+          },
+          "askPrice": {
+            "type": "string",
+            "description": "Lowest Ask price of base currency based on given quote currency."
+          },
+          "bidPrice": {
+            "type": "string",
+            "description": "Highest bid price of base currency based on given quote currency."
+          },
+          "baseVolume": {
+            "type": "string",
+            "description": "The amount of the cryptocurrency that has been traded in the last 24 hours. Shown in base currency"
+          },
+          "quoteVolume": {
+            "type": "string",
+            "description": "The amount of the cryptocurrency that has been traded in the last 24 hours. Shown in quote currency"
+          },
+          "lastTradePrice": {
+            "type": "string",
+            "description": "The last price represents the price at which the last trade occurred."
+          },
+          "lastTradeVolume": {
+            "type": "string",
+            "description": "The volume of the last trade"
+          },
+          "openPrice": {
+            "type": "string",
+            "description": "The price of the first trade within 24 hours"
+          },
+          "priceChange": {
+            "type": "string",
+            "description": "Price change in 24 hours. Shown as a percentage"
+          },
+          "tradeCount": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of trades per day"
+          },
+          "timestamp": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Format  in Unix Epoch Time: 1582882393000 (milliseconds since 1 Jan 1970), which is equal to 2020-02-28 13:33:13.113108"
+          }
+        }
+      },
+      "AllMarketsSummeryView": {
+        "type": "object",
+        "properties": {
+          "tickers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TickerView"
+            }
+          },
+          "pairs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PairView"
+            }
+          }
+        }
+      },
+      "TradeView": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Trade unique identifier"
+          },
+          "price": {
+            "type": "string",
+            "description": "Unit price"
+          },
+          "volume": {
+            "type": "string",
+            "description": "Amount in based currency"
+          },
+          "quoteVolume": {
+            "type": "string",
+            "description": "Amount in quote currency"
+          },
+          "side": {
+            "type": "string",
+            "description": "Trade Type",
+            "enum": [
+              "ASK",
+              "BID"
+            ]
+          },
+          "timestamp": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Format  in Unix Epoch Time: 1582882393000 (milliseconds since 1 Jan 1970), which is equal to 2020-02-28 13:33:13.113108"
+          }
+        }
+      },
+      "CurrencyView": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "The small name of the currency"
+          },
+          "name": {
+            "type": "string",
+            "description": "Full name of the currency"
+          },
+          "type": {
+            "type": "string",
+            "description": "Currency type",
+            "enum": [
+              "FIAT",
+              "CRYPTO"
+            ]
+          },
+          "transactionUrlPattern": {
+            "type": "string",
+            "description": "Blockchain transaction search link"
+          },
+          "addressUrlPattern": {
+            "type": "string",
+            "description": "Blockchain address search link"
+          }
+        }
+      },
+      "OrderBookView": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Format  in Unix Epoch Time: 1582882393000 (milliseconds since 1 Jan 1970), which is equal to 2020-02-28 13:33:13.113108"
+          },
+          "bids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SimpleOrderView"
+            }
+          },
+          "asks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SimpleOrderView"
+            }
+          }
+        }
+      },
+      "SimpleOrderView": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "string",
+            "description": "Unit price"
+          },
+          "volume": {
+            "type": "string",
+            "description": "Amount in based currency"
+          },
+          "totalCost": {
+            "type": "string",
+            "description": "Amount in quote currency"
+          }
+        }
+      },
+      "SimpleTradeView": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Unique identifier"
+          },
+          "baseCurrency": {
+            "type": "string",
+            "description": "Amount in based currency"
+          },
+          "quoteCurrency": {
+            "type": "string",
+            "description": "Amount in quote currency"
+          },
+          "action": {
+            "type": "string",
+            "description": "Transaction Type",
+            "enum": [
+              "ASK",
+              "BID"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "INSTANT",
+              "OTC"
+            ]
+          },
+          "size": {
+            "type": "string"
+          },
+          "price": {
+            "type": "string"
+          },
+          "cumulativeCost": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "WAITING_DEPOSIT",
+              "PENDING",
+              "FAILED",
+              "EXPIRED",
+              "COMPLETED"
+            ]
+          },
+          "sendAddress": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "creationTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "creatorUserId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lastChangeTime": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "NewOrderRequest": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string",
+            "description": "A currency pair is the quotation of two different currencies, with the value of one currency being quoted against the other. The first listed currency of a currency pair is called the base currency, and the second currency is called the quote currency. E.g: ETH-BTC, BTC-USD, USDT-USD"
+          },
+          "clientOrderId": {
+            "type": "string"
+          },
+          "orderAction": {
+            "type": "string",
+            "enum": [
+              "ASK",
+              "BID"
+            ]
+          },
+          "orderType": {
+            "type": "string",
+            "enum": [
+              "MARKET",
+              "LIMIT_ORDER"
+            ]
+          },
+          "price": {
+            "type": "number"
+          },
+          "size": {
+            "type": "number"
+          }
+        }
+      },
+      "CancelOrderView": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "IN_PROGRESS",
+              "PARTIALLY_FILLED",
+              "FULLY_EXECUTED",
+              "CANCELED"
+            ]
+          },
+          "executedSize": {
+            "type": "string"
+          }
+        }
+      },
+      "OrderView": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pair": {
+            "type": "string",
+            "description": "A currency pair is the quotation of two different currencies, with the value of one currency being quoted against the other. The first listed currency of a currency pair is called the base currency, and the second currency is called the quote currency. E.g: ETH-BTC, BTC-USD, USDT-USD"
+          },
+          "price": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "executedSize": {
+            "type": "string"
+          },
+          "percentFilled": {
+            "type": "string"
+          },
+          "cumulativeCost": {
+            "type": "string",
+            "description": "the sum of all costs of any additional purchases of goods or services made pursuant to an existing contract"
+          },
+          "averagePrice": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "ASK",
+              "BID"
+            ]
+          },
+          "orderType": {
+            "type": "string",
+            "enum": [
+              "MARKET",
+              "LIMIT_ORDER"
+            ]
+          },
+          "timeInForce": {
+            "type": "string",
+            "enum": [
+              "GTC",
+              "IOC"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "IN_PROGRESS",
+              "PARTIALLY_FILLED",
+              "FULLY_EXECUTED",
+              "CANCELED"
+            ]
+          },
+          "timestamp": {
+            "type": "integer",
+            "format": "int64",
+            "description": "To timestamp, Format in Unix Epoch Time: 1582882393000 (milliseconds since 1 Jan 1970), which is equal to 2020-02-28 13:33:13.113108"
+          },
+          "lastChangeTime": {
+            "type": "integer",
+            "format": "int64",
+            "description": "To timestamp, Format in Unix Epoch Time: 1582882393000 (milliseconds since 1 Jan 1970), which is equal to 2020-02-28 13:33:13.113108"
+          }
+        }
+      },
+      "TradePrivateView": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string"
+          },
+          "orderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "feeCurrency": {
+            "type": "string"
+          },
+          "fee": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "price": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "quoteVolume": {
+            "type": "string"
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "ASK",
+              "BID"
+            ]
+          },
+          "timestamp": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "BalanceView": {
+        "type": "object",
+        "properties": {
+          "currencyCode": {
+            "type": "string",
+            "description": "Short name of the currency"
+          },
+          "currencyName": {
+            "type": "string",
+            "description": "Full name of the currency"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "FIAT",
+              "CRYPTO"
+            ]
+          },
+          "available": {
+            "type": "string",
+            "description": "the total amount of money in your account that you can use for purchases and withdrawals"
+          },
+          "total": {
+            "type": "string",
+            "description": "The total amount of coin in existence right now"
+          },
+          "valueBTC": {
+            "type": "string",
+            "description": "current total value of existing coin in BTC"
+          },
+          "valueUSD": {
+            "type": "string",
+            "description": "current total value of existing coin in USD"
+          }
+        }
+      },
+      "ECommerceProviderView": {
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string"
+          },
+          "iconName": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          }
+        }
+      },
+      "FeeView": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "DEPOSIT",
+              "WITHDRAWAL"
+            ]
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "ECOMMERCE",
+              "WIRE",
+              "WALLET",
+              "WALLET_INTERNAL",
+              "SWAP"
+            ]
+          },
+          "provider": {
+            "type": "string"
+          },
+          "fees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeeDataView"
+            }
+          }
+        }
+      },
+      "FeeDataView": {
+        "type": "object",
+        "properties": {
+          "rangeStart": {
+            "type": "number"
+          },
+          "rangeEnd": {
+            "type": "number"
+          },
+          "subMethod": {
+            "type": "string",
+            "enum": [
+              "VISA",
+              "MASTERCARD",
+              "AMEX",
+              "DEFAULT"
+            ]
+          },
+          "percentageValue": {
+            "type": "number"
+          },
+          "fixedValue": {
+            "type": "number"
+          },
+          "minValue": {
+            "type": "number"
+          }
+        }
+      },
+      "LimitView": {
+        "type": "object",
+        "properties": {
+          "minValue": {
+            "type": "string"
+          },
+          "maxValue": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "ECOMMERCE",
+              "WIRE",
+              "WALLET",
+              "WALLET_INTERNAL",
+              "SWAP"
+            ]
+          },
+          "transactionType": {
+            "type": "string",
+            "enum": [
+              "DEPOSIT",
+              "WITHDRAWAL"
+            ]
+          },
+          "provider": {
+            "type": "string"
+          }
+        }
+      },
+      "BalanceWrapperView": {
+        "type": "object",
+        "properties": {
+          "balances": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BalanceView"
+            }
+          },
+          "totalValueBTC": {
+            "type": "string",
+            "description": "total value of existing coins in BTC"
+          },
+          "totalValueUSD": {
+            "type": "string",
+            "description": "total value of existing coins in usd"
+          }
+        }
+      },
+      "OrderResultView": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "IN_PROGRESS",
+              "PARTIALLY_FILLED",
+              "FULLY_EXECUTED",
+              "CANCELED"
+            ]
+          },
+          "timestamp": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "price": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "executedSize": {
+            "type": "string"
+          }
+        }
+      },
+      "CoinWithdrawalRequest": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "description": "Which coin to operate with"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "address": {
+            "type": "string",
+            "description": "A place where cryptocurrency can be sent to and from, in the form of a string of letters and numbers."
+          },
+          "addressTag": {
+            "type": "string",
+            "description": "A Destination Tag/Memo is an additional address feature necessary for identifying a transaction recipient beyond a wallet address."
+          },
+          "note": {
+            "type": "string"
+          },
+          "includeFee": {
+            "type": "boolean"
+          },
+          "forceBlockchain": {
+            "type": "boolean"
+          }
+        }
+      },
+      "WithdrawView": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      }
+    }
+  }
+}
