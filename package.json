@@ -1,6 +1,6 @@
 {
   "name": "@n8n-dev/n8n-nodes-cryptal",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Licensed cryptocurrency exchange and wallet supporting instant buy sell with Georgian Lari and multiple payment methods",
   "license": "MIT",
   "homepage": "https://n8n-code.github.io/n8n-dev/#/n8n-nodes-cryptal",
